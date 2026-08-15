@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Filament\Resources\ButtonImages\Schemas;
+
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
+
+class ButtonImageForm
+{
+    public static function configure(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                TextInput::make('name')
+                    ->required(),
+                TextInput::make('diagram')
+                    ->url()
+                    ->required(),
+            ]);
+    }
+}
