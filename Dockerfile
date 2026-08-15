@@ -1,5 +1,5 @@
-# Use PHP 8.2 FPM as base image
-FROM php:8.2-fpm
+# Use PHP 8.3 FPM as base image
+FROM php:8.3-fpm
 
 # Install system dependencies and Node.js
 RUN apt-get update && apt-get install -y \
@@ -31,18 +31,20 @@ WORKDIR /var/www
 
 # Copy composer files and install PHP dependencies
 COPY composer.json composer.lock ./
-RUN composer install --no-scripts --no-autoloader
+RUN composer install --no-scripts --no-autoloader --optimize-autoloader --no-dev
 
 # Copy package files and install NPM dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm install --no-fund --no-audit
 
 # Copy the rest of the application code
 COPY . .
 
-# Generate optimized autoloader and build frontend assets
+# Generate optimized autoloader
 RUN composer dump-autoload --optimize
-RUN npm run build
+
+# Build frontend assets with memory limit
+RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build
 
 # Set proper permissions for Laravel directories
 RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache && \
